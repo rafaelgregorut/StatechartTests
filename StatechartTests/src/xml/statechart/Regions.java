@@ -13,7 +13,7 @@ public class Regions {
 
 	private String name;
 	
-	Regions() {
+	public Regions() {
 		listVertices = new ArrayList<Vertices>();
 	}
 	

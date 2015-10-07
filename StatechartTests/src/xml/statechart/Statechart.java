@@ -11,7 +11,7 @@ public class Statechart {
 
 	private ArrayList<Regions> listRegions;
 	
-	Statechart() {
+	public Statechart() {
 		listRegions = new ArrayList<Regions>();
 	}
 
