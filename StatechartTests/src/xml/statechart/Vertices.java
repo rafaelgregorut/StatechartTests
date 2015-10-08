@@ -24,6 +24,7 @@ public class Vertices {
 	Vertices() {
 		listTransitions = new ArrayList<OutgoingTransitions>();
 		listRegions = new ArrayList<Regions>();
+		name = "";
 	}
 
 	@XmlElement(name="outgoingTransitions")

@@ -1,8 +1,8 @@
 package xml.statechart;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
-import javax.xml.bind.annotation.XmlAttribute;  
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -11,8 +11,11 @@ public class Statechart {
 
 	private ArrayList<Regions> listRegions;
 	
+	public Hashtable<String,Vertices> statesId;
+	
 	public Statechart() {
 		listRegions = new ArrayList<Regions>();
+		statesId = new Hashtable<String,Vertices>();
 	}
 
 	@XmlElement(name="regions")
@@ -30,4 +33,9 @@ public class Statechart {
 		}
 	}
 	
+	public void constructStateIdHash() {
+		for (Regions r : listRegions) {
+			r.addToStatesIdHash(statesId);
+		}
+	}
 }
