@@ -72,7 +72,7 @@ public class Regions {
 		return null;
 	}
 	
-	public Set<String> constructSetC(Hashtable<String,Vertices> hash,Hashtable<String,Vertices> hashCaminhoVert,
+	public Set<String> constructSetC(Hashtable<String,Vertices> hash,Hashtable<String,Vertices> hashCaminhoVert, 
 			Hashtable<Vertices,Set<String>> hashFilhos) {
 		Vertices initial = getInitialState();
 		
@@ -95,45 +95,36 @@ public class Regions {
 			System.out.print("\t");
 	}
 	
+	Set<String> filhosPaths = null;
+
 	public Set<String> constructSetCRec(int i,Vertices v, Hashtable<String, Vertices> hashId, ArrayList<Vertices> visitados,String p, 
-			Set<String> setC, Hashtable<String,Vertices> hashCaminhoVert, Hashtable<Vertices, Set<String>> hashFilhos) {
-		//printRec(i);System.out.println(v.getType()+" "+v.getName());
+			Set<String> setC, Hashtable<String,Vertices> hashCaminhoVert, Hashtable<Vertices,Set<String>> hashFilhos) {
+		System.out.println("Regiao: "+this.name+" v: "+v.getName());
 		visitados.add(v);
 		setC.add(p);
 		hashCaminhoVert.put(p, v);
 		
 		String newT = "";
 		boolean vEhPai = (v.getListRegions().size() != 0);
-		Set<String> filhosPaths = null;
 		
 		if(vEhPai) {
-			//printRec(i);System.out.println("vEhPai aqui:"+v.getName());
-			//del = hashCaminhoVert.remove(p);
-			
-			
+			printRec(i);System.out.println("vEhPai aqui:"+v.getName());
+						
 			//filhosPaths = v.getListRegions().get(0).constructSetC(hashId,hashCaminhoVert,hashFilhos);
 			Vertices initFilho = v.getListRegions().get(0).getInitialState();
-			filhosPaths = v.getListRegions().get(0).constructSetCRec(i+1,initFilho, hashId, visitados, p, setC, hashCaminhoVert, hashFilhos);
+			System.out.println("Recursao na regiao "+v.getListRegions().get(0).getName());
+			//filhosPaths = v.getListRegions().get(0).constructSetCRec(i+1,initFilho, hashId, visitados, p, setC, hashCaminhoVert);
+			filhosPaths = v.getListRegions().get(0).constructSetC(hashId,hashCaminhoVert,hashFilhos);
 			
-			for (String f : filhosPaths)
-				System.out.println(f);
-				
 			setC.remove(p);
+			setC.add(p+" @_"+v.getName());
 
 			//hashFilhos eh usado no TestGenerator
 			hashFilhos.put(v, filhosPaths);			
-			for (Vertices vPai : hashFilhos.keySet()) {
-				for (String str : hashFilhos.get(vPai)) {
-					System.out.println(vPai.getName()+" -> "+str);
-				}
+			
+			for (String str : filhosPaths) {
+				System.out.println(str+" eh filho de "+v.getName());
 			}
-			
-			/*for (String filhoPath : filhosPaths) {
-				Vertices vDest = hashCaminhoVert.remove(filhoPath);
-				hashCaminhoVert.put(p+filhoPath, v);
-			}*/
-			
-			
 		}
 			
 		for (OutgoingTransitions out : v.getListTransitions()) {
@@ -150,45 +141,11 @@ public class Regions {
 					constructSetCRec(i+1,proxV,hashId,visitados,p+" "+newT,setC,hashCaminhoVert,hashFilhos);
 			}
 		}
-		/*
+		
 		if (vEhPai) {
-			
-
-			System.out.println("vEhPai aqui tmb tbm:"+v.getName());
-			Enumeration<String> keys = hashCaminhoVert.keys();
-			while (keys.hasMoreElements()) {
-				String incompletePath = keys.nextElement();
-				if(incompletePath.contains("@_"+v.getName())) {
-					Vertices destState = hashCaminhoVert.remove(incompletePath);
-					for (String filhoPath: filhosPaths) {
-						 String aux = incompletePath.replace("@_"+v.getName(), filhoPath);
-						 hashCaminhoVert.put(aux, destState);
-					}
-				}
-			}
-			Set<String> newFilhosPath = new TreeSet<String>();
-			
-			for (String caminhoFilho : filhosPaths) {
-				Vertices f = hashCaminhoVert.remove(caminhoFilho);
-				if(f!= null) {
-					//printRec(i);System.out.println("removi caminho "+caminhoFilho);
-					//printRec(i);System.out.println(" que ia pro "+f.getName());
-					hashCaminhoVert.put(p+caminhoFilho,f);
-					newFilhosPath.add(p+caminhoFilho);
-				} else {
-					hashCaminhoVert.put(p+caminhoFilho,del);
-					newFilhosPath.add(p+caminhoFilho);
-				}
-					
-			}
-			//hashCaminhoVert.remove(p);
-			hashFilhos.remove(v);
-			hashFilhos.put(v, newFilhosPath);
-		}*/
-		System.out.println("ultimo "+v.getName());
-		for (Vertices vPai : hashFilhos.keySet()) {
-			for (String str : hashFilhos.get(vPai)) {
-				System.out.println(vPai.getName()+" -> "+str);
+			System.out.println("ultimo "+v.getName());
+			for (String str : filhosPaths) {
+				System.out.println(str+" eh filho de "+v.getName());
 			}
 		}
 		
