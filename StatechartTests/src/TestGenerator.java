@@ -1,10 +1,10 @@
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import xml.statechart.OutgoingTransitions;
 import xml.statechart.Regions;
 import xml.statechart.Statechart;
 import xml.statechart.Vertices;
@@ -34,22 +34,78 @@ public class TestGenerator {
 		this.sc = sc;
 	}
 	
+	public Set<String> expandPath(String original, Set<String> pathsFilhosSet, Vertices vPai) {
+		Set<String> expandedSet = new TreeSet<String>();
+		
+		for (String filhoPath : pathsFilhosSet) {
+			String expandedPath = original.replace("@"+vPai.getName()+"@", filhoPath);
+			expandedSet.add(expandedPath);
+		}
+		
+		return expandedSet;
+	}
+	
+	public boolean ehPai(Vertices v) {
+		return (hashFilhos.get(v) != null);
+	}
+	
+	/*Elimina recursivamente os caminhos de cobertura dos estados pai*/
+	public void expandPaiPath(Hashtable<String,Vertices> mapSetC, Hashtable<Vertices,Set<String>> reverseMapSetC) {
+		for (Vertices v : sc.getListRegions().get(0).getListVertices()) {
+			if (ehPai(v)) {
+				String[] a = new String[1];
+				String paiPath = reverseMapSetC.get(v).toArray(a)[0];
+				expandPaiPathRec(mapSetC,v,paiPath);
+			}
+		}
+	}
+	
+	/*Usado para eliminar o caminho de cobertura de um estado pai (Recursivo)*/
+	public void expandPaiPathRec(Hashtable<String,Vertices> mapSetC, Vertices vPai, String caminhoPai) {
+		/*Pegos os filhos do pai*/
+		Set<String> filhosPaths= hashFilhos.get(vPai);
+	
+		/*Para cada caminho filho*/
+		for (String caminhoFilho : filhosPaths) {
+			
+			/*Pego o filho de destino*/
+			Vertices filhoDest = mapSetC.get(caminhoFilho);
+			if (filhoDest != null) {
+				//System.out.println("Caminho: "+caminhoFilho);
+				String prefixPai = caminhoPai.replace("@"+vPai.getName()+"@", caminhoFilho);
+				mapSetC.put(prefixPai, filhoDest);
+				if (ehPai(filhoDest))
+					expandPaiPathRec(mapSetC,filhoDest,prefixPai);
+				
+				mapSetC.remove(caminhoFilho);
+			}
+		}
+		mapSetC.remove(caminhoPai);
+	}
+	
+	
 	public Set<String> createTestPaths() {
 		Regions mainRegion = sc.getListRegions().get(0);
-		Hashtable<String, Vertices> caminhosVerts = new Hashtable<String,Vertices>();
+		//Hashtable<String, Vertices> caminhosVerts = new Hashtable<String,Vertices>();
 		
-		Set<String> set = mainRegion.constructSetC(sc.statesId,caminhosVerts,hashFilhos);
+		/*Gero o setC, ainda nao expandido*/
+		Hashtable<String,Vertices> mapPathCVertice = mainRegion.constructSetC(sc.statesId,hashFilhos);
 		
 		System.out.println("Set C:");
-		for (String str : set) {
-			System.out.println(str);
+		for (String str : mapPathCVertice.keySet()) {
+			System.out.println(str+" cobre o "+mapPathCVertice.get(str).getName());
 		}
-		/*for (String path : caminhosVerts.keySet()) {
-			System.out.println(caminhosVerts.get(path).getName()+": "+path);
-		}*/
+		
+		Hashtable<Vertices,Set<String>> mapVertPaths = reverseHash(mapPathCVertice);
+		System.out.println("Semi-Expanded set C:");
+		/*Preciso expandir o Set C*/
+		expandPaiPath(mapPathCVertice,mapVertPaths);
+		for (String str : mapPathCVertice.keySet()) {
+			System.out.println(str+" cobre o "+mapPathCVertice.get(str).getName()+" ("+mapPathCVertice.get(str).getType()+")");
+		}
 		
 		System.out.println("Test cases:");
-		Hashtable<Vertices,Set<String>> mapVertPaths = reverseHash(caminhosVerts);
+		
 		return null;
 		//return generateTestPaths(mapVertPaths);
 	}
