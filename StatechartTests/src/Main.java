@@ -1,3 +1,5 @@
+import java.util.Set;
+
 import xml.handler.XMLProcessor;
 import xml.statechart.Statechart;
 
@@ -5,7 +7,7 @@ public class Main {
 
 	public static void main(String[] args) throws Exception{
 				
-		String filePath_1 = "/Users/rafaelgregorut/Documents/workspace/YakinduTest/test2.xml";
+		String filePath_1 = "/Users/rafaelgregorut/Documents/workspace/YakinduTest/test4.xml";
 		
 		XMLProcessor xml = new XMLProcessor();
 		
@@ -19,7 +21,12 @@ public class Main {
 		
 		statechart.constructStateIdHash();
 		TestGenerator tg = new TestGenerator(statechart);
-		tg.constructSetC();
+		Set<String> testPaths = tg.createTestPaths();
+		
+		/*System.out.println("Caminhos computados no all-transitions:");
+		for (String path : testPaths) {
+			System.out.println(path);
+		}*/
 	}
 
 }
