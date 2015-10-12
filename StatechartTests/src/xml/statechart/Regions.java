@@ -72,12 +72,12 @@ public class Regions {
 		return null;
 	}
 	
-	public Hashtable<String,Vertices> constructSetC(Hashtable<String,Vertices> hash, 
+	public Hashtable<Vertices,String> constructSetC(Hashtable<String,Vertices> hash, 
 			Hashtable<Vertices,Set<String>> hashFilhos) {
 		Vertices initial = getInitialState();
 		
 		ArrayList<Vertices> visit = new ArrayList<Vertices>();
-		Hashtable<String,Vertices> setCHash = new Hashtable<String,Vertices>();
+		Hashtable<Vertices,String> setCHash = new Hashtable<Vertices,String>();
 		
 		constructSetCRec(0,initial,hash,visit,"",setCHash,hashFilhos);
 		
@@ -95,21 +95,30 @@ public class Regions {
 			System.out.print("\t");
 	}
 	
+	private boolean caminhoJaTemPai(Hashtable<Vertices,Set<String>> hashFilhos, String caminho) {
+		for (Map.Entry<Vertices, Set<String>> entry : hashFilhos.entrySet()) {
+			if (entry.getValue().contains(caminho))
+				return true;
+		}
+		return false;
+	}
+	
 
-	public Hashtable<String,Vertices> constructSetCRec(int i,Vertices v, Hashtable<String, Vertices> hashId, ArrayList<Vertices> visitados,String p, 
-			Hashtable<String,Vertices> setCHash, Hashtable<Vertices,Set<String>> hashFilhos) {
+	public Hashtable<Vertices,String> constructSetCRec(int i,Vertices v, Hashtable<String, Vertices> hashId, ArrayList<Vertices> visitados,String p, 
+			Hashtable<Vertices,String> setCHash, Hashtable<Vertices,Set<String>> hashFilhos) {
+		System.out.println(v.getName());
 		/*Adiciono o vertice na lista de visitados*/
 		visitados.add(v);
 		
 		/*Associo o caminho ate aqui com o vertice*/
-		setCHash.put(p,v);
+		setCHash.put(v,p);
 		
 		String newT = "";
 		
 		/*Preparo pra ver se o vertice eh pai de outros*/
 		boolean vEhPai = (v.getListRegions().size() != 0);
 		Set<String> filhosPathsSet = new TreeSet<String>();
-		Hashtable<String,Vertices> filhosPathsHash = null;
+		Hashtable<Vertices,String> filhosPathsHash = null;
 		
 		/*Se for pai*/
 		if(vEhPai) {						
@@ -117,17 +126,28 @@ public class Regions {
 			filhosPathsHash = v.getListRegions().get(0).constructSetC(hashId,hashFilhos);
 			
 			/*Removo a associacao do caminho ate aqui com o vertice pai*/
-			setCHash.remove(p);
+			setCHash.remove(v);
 			
 			/*Renovo a associacao do caminho ate aqui com o vertice pai, deixando marcado que preciso expandir o caminho*/
-			setCHash.put(p+" @"+v.getName()+"@",v);
+			setCHash.put(v,p+" @"+v.getId()+"@");
 
 			/*Crio o conjunto dos caminhos dos filhos*/
-			for (String filhoPath : filhosPathsHash.keySet())
-				filhosPathsSet.add(filhoPath);
+			for (Vertices possivelFilho : filhosPathsHash.keySet()) {
+				if (v.getListRegions().get(0).getListVertices().contains(possivelFilho))
+					filhosPathsSet.add(filhosPathsHash.get(possivelFilho));
+			}
+				
 			
 			/*Associo o conjunto dos caminhos dos filhos com o vertice pai. O hashFilhos eh usado no TestGenerator*/
-			hashFilhos.put(v, filhosPathsSet);
+			Set<String> filhosAbsolutos = new TreeSet<String>();
+			/*Tenho que ver se eh caminho de um filho mesmo. Poder ser de um neto, etc*/
+			for (String possivelFilho : filhosPathsSet) {
+				//if(!caminhoJaTemPai(hashFilhos,possivelFilho)) {
+					//System.out.println("aqui com "+possivelFilho+" "+v.getName());
+					filhosAbsolutos.add(possivelFilho);
+				//}
+			}
+			hashFilhos.put(v, filhosAbsolutos);
 			
 			/*Associo cada caminho filho ao vertice que ele cobriu*/
 			setCHash.putAll(filhosPathsHash);
@@ -151,7 +171,7 @@ public class Regions {
 				/*Se o estado onde estou eh pai*/
 				if(vEhPai) {
 					/*chamo a recursao deixando indicado que preciso expandir*/
-					constructSetCRec(i+1,proxV,hashId,visitados,p+" "+"@"+v.getName()+"@ "+newT,setCHash,hashFilhos);
+					constructSetCRec(i+1,proxV,hashId,visitados,p+" "+"@"+v.getId()+"@ "+newT,setCHash,hashFilhos);
 				}
 				else {
 					/*Chamo a recursao sem indicar expansao*/

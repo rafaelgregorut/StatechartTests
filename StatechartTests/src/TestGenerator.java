@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -16,9 +18,7 @@ public class TestGenerator {
 	
 	Hashtable<Vertices,String> setC;
 	
-	Set<String> setCReal;
-	
-	Hashtable<Vertices,String> exitTransitions;
+	Hashtable<String,Vertices>  reverseMapSetC;
 	
 	Hashtable<Vertices,Set<String>> hashFilhos;
 	
@@ -28,9 +28,9 @@ public class TestGenerator {
 	
 	public TestGenerator(Statechart sc) {
 		setC = new Hashtable<Vertices,String>();
-		exitTransitions = new Hashtable<Vertices,String>();
 		hashFilhos = new Hashtable<Vertices,Set<String>>();
 		testPaths = new TreeSet<String>();
+		reverseMapSetC = new Hashtable<String,Vertices>();
 		this.sc = sc;
 	}
 	
@@ -38,7 +38,7 @@ public class TestGenerator {
 		Set<String> expandedSet = new TreeSet<String>();
 		
 		for (String filhoPath : pathsFilhosSet) {
-			String expandedPath = original.replace("@"+vPai.getName()+"@", filhoPath);
+			String expandedPath = original.replace("@"+vPai.getId()+"@", filhoPath);
 			expandedSet.add(expandedPath);
 		}
 		
@@ -46,22 +46,31 @@ public class TestGenerator {
 	}
 	
 	public boolean ehPai(Vertices v) {
-		return (hashFilhos.get(v) != null);
+		return (v.getListRegions().size() > 0);
 	}
 	
 	/*Elimina recursivamente os caminhos de cobertura dos estados pai*/
-	public void expandPaiPath(Hashtable<String,Vertices> mapSetC, Hashtable<Vertices,Set<String>> reverseMapSetC) {
+	public void expandPaiPath(Hashtable<Vertices,String> mapSetC) {
 		for (Vertices v : sc.getListRegions().get(0).getListVertices()) {
 			if (ehPai(v)) {
 				String[] a = new String[1];
-				String paiPath = reverseMapSetC.get(v).toArray(a)[0];
+				String paiPath = mapSetC.get(v);
 				expandPaiPathRec(mapSetC,v,paiPath);
 			}
 		}
 	}
 	
+	private Vertices achaFilhoCorrespondente(String caminho, Vertices pai, Hashtable<Vertices,String> mapSetC) {
+		for (Vertices v : mapSetC.keySet()) {
+			if (mapSetC.get(v) == caminho && pai.getListRegions().get(0).getListVertices().contains(v)) {
+				return v;
+			}
+		}
+		return null;
+	}
+	
 	/*Usado para eliminar o caminho de cobertura de um estado pai (Recursivo)*/
-	public void expandPaiPathRec(Hashtable<String,Vertices> mapSetC, Vertices vPai, String caminhoPai) {
+	public void expandPaiPathRec(Hashtable<Vertices,String> mapSetC, Vertices vPai, String caminhoPai) {
 		/*Pegos os filhos do pai*/
 		Set<String> filhosPaths= hashFilhos.get(vPai);
 	
@@ -69,18 +78,20 @@ public class TestGenerator {
 		for (String caminhoFilho : filhosPaths) {
 			
 			/*Pego o filho de destino*/
-			Vertices filhoDest = mapSetC.get(caminhoFilho);
-			if (filhoDest != null) {
+			Vertices filhoDest = achaFilhoCorrespondente(caminhoFilho,vPai,mapSetC);
+			
+			//Quando inverto o mapa posso sobreescrever informacao
+			
+			if (filhoDest != null && filhoDest.getType() != "Entry") {
 				//System.out.println("Caminho: "+caminhoFilho);
-				String prefixPai = caminhoPai.replace("@"+vPai.getName()+"@", caminhoFilho);
-				mapSetC.put(prefixPai, filhoDest);
+				String prefixPai = caminhoPai.replace("@"+vPai.getId()+"@", caminhoFilho);
+				mapSetC.put(filhoDest,prefixPai);
+				System.out.println("Coloquei o "+filhoDest.getName()+" com cobertura "+prefixPai);
 				if (ehPai(filhoDest))
 					expandPaiPathRec(mapSetC,filhoDest,prefixPai);
-				
-				mapSetC.remove(caminhoFilho);
-			}
+				}
 		}
-		mapSetC.remove(caminhoPai);
+		mapSetC.remove(vPai);
 	}
 	
 	
@@ -89,82 +100,141 @@ public class TestGenerator {
 		//Hashtable<String, Vertices> caminhosVerts = new Hashtable<String,Vertices>();
 		
 		/*Gero o setC, ainda nao expandido*/
-		Hashtable<String,Vertices> mapPathCVertice = mainRegion.constructSetC(sc.statesId,hashFilhos);
+		Hashtable<Vertices,String> mapSetC = mainRegion.constructSetC(sc.statesId,hashFilhos);
 		
 		System.out.println("Set C:");
-		for (String str : mapPathCVertice.keySet()) {
-			System.out.println(str+" cobre o "+mapPathCVertice.get(str).getName());
+		for (Vertices v : mapSetC.keySet()) {
+			System.out.println(v.getName()+"("+v.getType()+")"+" coberto por "+mapSetC.get(v));
 		}
 		
-		Hashtable<Vertices,Set<String>> mapVertPaths = reverseHash(mapPathCVertice);
 		System.out.println("Semi-Expanded set C:");
 		/*Preciso expandir o Set C*/
-		expandPaiPath(mapPathCVertice,mapVertPaths);
-		for (String str : mapPathCVertice.keySet()) {
-			System.out.println(str+" cobre o "+mapPathCVertice.get(str).getName()+" ("+mapPathCVertice.get(str).getType()+")");
+		reverseMapSetC = reverseHash(mapSetC);
+		expandPaiPath(mapSetC);
+		for (Vertices v : mapSetC.keySet()) {
+			System.out.println(v.getName()+"("+v.getType()+")"+" coberto por "+mapSetC.get(v));
 		}
 		
-		System.out.println("Test cases:");
+		System.out.println("Componentes de teste simples:");
+		Set<TestComponent> tcSet = geraComponentesDeTestSimples(mapSetC);
+		for (TestComponent tc : tcSet) {
+			System.out.println(tc.sequenciaCobertura+" atinge "+tc.atingido.getName()+" #"+tc.atingido.getType());
+		}
+		
+		System.out.println("mapSetC que sobrou:");
+		for (Vertices v : mapSetC.keySet()) {
+			System.out.println(v.getName()+"("+v.getType()+")"+" coberto por "+mapSetC.get(v));
+		}
+		
+		System.out.println("Componentes de teste complexos:");
+		Set<TestComponent> tcSet2 = geraComponentesDeTestHierarquia(mapSetC);
+		for (TestComponent tc : tcSet2) {
+			System.out.println(tc.sequenciaCobertura+" atinge "+tc.atingido.getName()+" #"+tc.atingido.getType());
+		}
 		
 		return null;
 		//return generateTestPaths(mapVertPaths);
 	}
 	
-	public Hashtable<Vertices, Set<String>> reverseHash(Hashtable<String,Vertices> hash) {
-		Hashtable<Vertices, Set<String>> newH = new Hashtable<Vertices,Set<String>>();
+	 public  List<String> getAllMatches(String text, String regex) {
+	        List<String> matches = new ArrayList<String>();
+	        Matcher m = Pattern.compile(regex).matcher(text);
+	        while(m.find()) {
+	            matches.add(m.group(1));
+	        }
+	        return matches;
+	 }
+	
+	 public String aindaPrecisaExpandir(Set<String> strSet) {
+
+		 for (String str : strSet) {
+		     if (str.contains("@")) {
+		    	 return str;
+		     }
+		 }
+		 
+		 return null;
+	 }
+	 
+	 public Set<String> geraFlatParaCaminho(String caminho) {
+		 
+		 Set<String> novosCaminhos = new TreeSet<String>();
+		 novosCaminhos.add(caminho);
+		 while (true) {
+		 	//List<String> matches = getAllMatches(caminho,"@(.*?)@");
+		 	//System.out.println(caminho+" ~ "+matches);
+			String strMuda = aindaPrecisaExpandir(novosCaminhos);
+		 	if(strMuda == null)
+		 		break;
+		 	//System.out.println("muda "+strMuda);
+		 	List<String> matches = getAllMatches(strMuda,"@(.*?)@");
+		 	String id = matches.get(0);
+		 	
+		 	Set<String> subCaminhos = hashFilhos.get(sc.statesId.get(id));
+		 	for (String caminhoSub : subCaminhos) {
+		 		String novoCaminho = strMuda.replace("@"+id+"@", caminhoSub);
+		 		novosCaminhos.add(novoCaminho);
+		 		//System.out.println("mudei "+novosCaminhos);
+		 	}
+	 		novosCaminhos.remove(strMuda);
+	 		//System.out.println(novosCaminhos);
+		 }
+		 
+		 return novosCaminhos;
+	 }
+	 
+	 
+	private void printTestSet(Set<TestComponent> tcSet) {
+		for (TestComponent tc : tcSet) {
+			System.out.println("tcSet tem "+tc.sequenciaCobertura+" atingindo "+tc.atingido.getName());
+		}
+	}
+	
+	public Set<TestComponent> geraComponentesDeTestHierarquia(Hashtable<Vertices,String> mapSetC) {
+
+		//Set<String> caminhosComplexos = new TreeSet<String>(mapSetC.values());
+		Set<TestComponent> tcSet = new TreeSet<TestComponent>();
+		for (Vertices v : mapSetC.keySet()) {
+			//System.out.println(v.getName()+" "+v.getType());
+			String str = mapSetC.get(v);
+			Set<String> flats = geraFlatParaCaminho(str);
+			for (String flat : flats) {
+				//System.out.println("add "+flat);
+				TestComponent tc = new TestComponent(flat,v);
+				tcSet.add(tc);
+			}
+			//printTestSet(tcSet);
+		}
+        
+        return tcSet;
+	}
+	
+	public Set<TestComponent> geraComponentesDeTestSimples(Hashtable<Vertices,String> mapSetC) {
+		Set<TestComponent> conjComponentesTeste= new TreeSet<TestComponent>();
+		Set<Vertices> deleteThis = new TreeSet<Vertices>();
 		
-		for (Map.Entry<String, Vertices> entry : hash.entrySet()) {
-			String str = entry.getKey();
-			Vertices v = entry.getValue();
-			if (newH.containsKey(v)) {
-				Set<String> temp = newH.remove(v);
-				temp.add(str);
-				newH.put(v,temp);
-			} else {
-				Set<String> newS = new TreeSet<String>();
-				newS.add(str);
-				newH.put(v, newS);
+		for (Vertices v : mapSetC.keySet()) {
+			if (!mapSetC.get(v).contains("@")) {
+				TestComponent tc = new TestComponent(mapSetC.get(v),v);
+				conjComponentesTeste.add(tc);
+				deleteThis.add(v);
 			}
 		}
+		
+		for (Vertices v : deleteThis)
+			mapSetC.remove(v);
+		
+		return conjComponentesTeste;
+	}
+	
+	public Hashtable<String, Vertices> reverseHash(Hashtable<Vertices,String> hash) {
+		Hashtable<String, Vertices> newH = new Hashtable<String,Vertices>();
+		
+		for (Map.Entry<Vertices,String> entry : hash.entrySet()) {
+			Vertices v = entry.getKey();
+			String str = entry.getValue();
+			newH.put(str, v);
+		}
 		return newH;
-	}
-	
-	public Set<String> generateTestPaths(Hashtable<Vertices,Set<String>> hashVertsCaminhos) {
-		
-		
-		
-		
-		
-		
-		
-		
-		/*for (Vertices state : sc.statesId.values()) {
-			System.out.println(state.getType()+": "+state.getName()+" "+state.getId());
-			for (OutgoingTransitions out : state.getListTransitions()) {
-				System.out.println("Testando transicao "+out.getSpecification());
-				Set<String> filhosPaths;
-				String testPath = "";
-				if ((filhosPaths = hashFilhos.get(state)) != null) {
-					for (String filhoPath : filhosPaths) {
-						testPath = filhoPath+" "+out.getSpecification();
-						System.out.println("\tTest transition: "+out.getSpecification());
-						System.out.println("\t"+testPath);
-						System.out.println("\tExpected next state:"+sc.statesId.get(out.getTarget()).getName());
-						testPaths.add(testPath);
-					}
-				} else if (hashVertsCaminhos.get(state) != null){
-					//primeiro entry nao esta mapeado -> da erro de numpointer
-					for(String path : hashVertsCaminhos.get(state)) {
-						testPath = path+" "+out.getSpecification();
-						System.out.println("\tTest transition: "+out.getSpecification());
-						System.out.println("\t"+testPath);
-						System.out.println("\tExpected next state:"+sc.statesId.get(out.getTarget()).getName());
-						testPaths.add(testPath);
-					}
-				}
-			}
-		}*/
-		return testPaths;
-	}
-	
+	}	
 }

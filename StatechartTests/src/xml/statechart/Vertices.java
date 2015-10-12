@@ -1,5 +1,6 @@
 package xml.statechart;
 
+
 import java.util.ArrayList;
 
 import javax.xml.bind.annotation.XmlAttribute;  
@@ -7,7 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(namespace = "xml.statechart.Statechart")
-public class Vertices {
+public class Vertices implements Comparable<Vertices>{
 
 	private ArrayList<OutgoingTransitions> listTransitions;
 	
@@ -26,6 +27,10 @@ public class Vertices {
 		listRegions = new ArrayList<Regions>();
 		name = "";
 	}
+	
+	public int compareTo(Vertices o) {
+        return getId().compareTo(o.getId());
+    }
 
 	@XmlElement(name="outgoingTransitions")
 	public ArrayList<OutgoingTransitions> getListTransitions() {
