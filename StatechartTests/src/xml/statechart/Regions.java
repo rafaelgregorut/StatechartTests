@@ -81,11 +81,11 @@ public class Regions {
 		
 		constructSetCRec(0,initial,hash,visit,"",setCHash,hashFilhos);
 		
-		System.out.println("Hash de filhos:");
+		/*System.out.println("Hash de filhos:");
 		for (Vertices vPai2 : hashFilhos.keySet()) {
 			for (String str2 : hashFilhos.get(vPai2))
 				System.out.println(vPai2.getName()+" -> "+str2);
-		}
+		}*/
 		
 		return setCHash;
 	}
@@ -106,7 +106,6 @@ public class Regions {
 
 	public Hashtable<Vertices,String> constructSetCRec(int i,Vertices v, Hashtable<String, Vertices> hashId, ArrayList<Vertices> visitados,String p, 
 			Hashtable<Vertices,String> setCHash, Hashtable<Vertices,Set<String>> hashFilhos) {
-		System.out.println(v.getName());
 		/*Adiciono o vertice na lista de visitados*/
 		visitados.add(v);
 		
@@ -140,12 +139,8 @@ public class Regions {
 			
 			/*Associo o conjunto dos caminhos dos filhos com o vertice pai. O hashFilhos eh usado no TestGenerator*/
 			Set<String> filhosAbsolutos = new TreeSet<String>();
-			/*Tenho que ver se eh caminho de um filho mesmo. Poder ser de um neto, etc*/
 			for (String possivelFilho : filhosPathsSet) {
-				//if(!caminhoJaTemPai(hashFilhos,possivelFilho)) {
-					//System.out.println("aqui com "+possivelFilho+" "+v.getName());
 					filhosAbsolutos.add(possivelFilho);
-				//}
 			}
 			hashFilhos.put(v, filhosAbsolutos);
 			
