@@ -52,6 +52,9 @@ public class TestGenerator {
 	
 	/*Elimina recursivamente os caminhos de cobertura dos estados pai*/
 	public void expandPaiPath(Hashtable<Vertices,String> mapSetC) {
+		/*NAO MUDEI AQUI PARA A CONCORRENCIA 
+		 * Faco a expansao dos pais do 1o nivel do statechart
+		 */
 		for (Vertices v : sc.getListRegions().get(0).getListVertices()) {
 			if (ehPai(v)) {
 				String paiPath = mapSetC.get(v);
@@ -62,8 +65,11 @@ public class TestGenerator {
 	
 	private Vertices achaFilhoCorrespondente(String caminho, Vertices pai, Hashtable<Vertices,String> mapSetC) {
 		for (Vertices v : mapSetC.keySet()) {
-			if (mapSetC.get(v) == caminho && pai.getListRegions().get(0).getListVertices().contains(v)) {
+			/*MUDEI AQUI PARA A CONCORRENCIA*/
+			for (int j = 0; j < pai.getListRegions().size(); j++) {
+			if (mapSetC.get(v) == caminho && pai.getListRegions().get(j).getListVertices().contains(v)) {
 				return v;
+			}
 			}
 		}
 		return null;
@@ -90,7 +96,9 @@ public class TestGenerator {
 					expandPaiPathRec(mapSetC,filhoDest,prefixPai);
 				}
 		}
+		String novoCaminhoPai = caminhoPai.replaceAll("@"+vPai.getId()+"@", "");
 		mapSetC.remove(vPai);
+		mapSetC.put(vPai, novoCaminhoPai);
 	}
 	
 	
@@ -110,9 +118,9 @@ public class TestGenerator {
 		/*Preciso expandir o Set C*/
 		//reverseMapSetC = reverseHash(mapSetC);
 		expandPaiPath(mapSetC);
-		/*for (Vertices v : mapSetC.keySet()) {
+		for (Vertices v : mapSetC.keySet()) {
 			System.out.println(v.getName()+"("+v.getType()+")"+" coberto por "+mapSetC.get(v));
-		}*/
+		}
 		
 		//System.out.println("Componentes de teste simples:");
 		Set<TestComponent> tcSet = geraComponentesDeTestSimples(mapSetC);
@@ -205,21 +213,26 @@ public class TestGenerator {
 		return testPaths;
 	}
 	
+	public void printTestSet(Set<TestComponent> s) {
+		for (TestComponent tc : s) {
+			System.out.println("tc: "+tc.sequenciaCobertura+" "+tc.atingido.getName());
+		}
+	}
 	
 	public Set<TestComponent> geraComponentesDeTestHierarquia(Hashtable<Vertices,String> mapSetC) {
 
 		//Set<String> caminhosComplexos = new TreeSet<String>(mapSetC.values());
 		Set<TestComponent> tcSet = new TreeSet<TestComponent>();
 		for (Vertices v : mapSetC.keySet()) {
-			//System.out.println(v.getName()+" "+v.getType());
+			System.out.println(v.getName()+" "+v.getType());
 			String str = mapSetC.get(v);
 			Set<String> flats = geraFlatParaCaminho(str);
 			for (String flat : flats) {
-				//System.out.println("add "+flat);
+				System.out.println("add "+flat);
 				TestComponent tc = new TestComponent(flat,v);
 				tcSet.add(tc);
 			}
-			//printTestSet(tcSet);
+			printTestSet(tcSet);
 		}
         
         return tcSet;

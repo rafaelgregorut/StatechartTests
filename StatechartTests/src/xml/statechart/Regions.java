@@ -120,9 +120,11 @@ public class Regions {
 		Hashtable<Vertices,String> filhosPathsHash = null;
 		
 		/*Se for pai*/
-		if(vEhPai) {						
+		if(vEhPai) {		
+			for (int j = 0; j < v.getListRegions().size(); j++) {
+			
 			/*Construo o conjunto de cobertura da regiao dos filhos separadamente*/
-			filhosPathsHash = v.getListRegions().get(0).constructSetC(hashId,hashFilhos);
+			filhosPathsHash = v.getListRegions().get(j).constructSetC(hashId,hashFilhos);
 			
 			/*Removo a associacao do caminho ate aqui com o vertice pai*/
 			setCHash.remove(v);
@@ -132,7 +134,7 @@ public class Regions {
 
 			/*Crio o conjunto dos caminhos dos filhos*/
 			for (Vertices possivelFilho : filhosPathsHash.keySet()) {
-				if (v.getListRegions().get(0).getListVertices().contains(possivelFilho))
+				if (v.getListRegions().get(j).getListVertices().contains(possivelFilho))
 					filhosPathsSet.add(filhosPathsHash.get(possivelFilho));
 			}
 				
@@ -146,6 +148,7 @@ public class Regions {
 			
 			/*Associo cada caminho filho ao vertice que ele cobriu*/
 			setCHash.putAll(filhosPathsHash);
+			}
 		}
 			
 		/*Para cada transicao que sai do vertice*/
