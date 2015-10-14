@@ -7,7 +7,7 @@ public class Main {
 
 	public static void main(String[] args) throws Exception{
 				
-		String filePath_1 = "/Users/rafaelgregorut/Documents/workspace/YakinduTest/test7.xml";
+		String filePath_1 = "/Users/rafaelgregorut/Documents/workspace/YakinduTest/test9.xml";
 		
 		XMLProcessor xml = new XMLProcessor();
 		

@@ -12,6 +12,8 @@ public class TestComponent implements Comparable<TestComponent> {
 	}
 	
 	public int compareTo(TestComponent o) {
-        return sequenciaCobertura.compareTo(o.sequenciaCobertura);
+		String myId = atingido.getId()+sequenciaCobertura;
+		String otherId = o.atingido.getId()+o.sequenciaCobertura;
+        return myId.compareTo(otherId);
     }
 }
