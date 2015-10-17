@@ -7,11 +7,12 @@ public class Main {
 
 	public static void main(String[] args) throws Exception{
 				
-		String filePath_1 = "/Users/rafaelgregorut/Documents/workspace/YakinduTest/test9.xml";
+		String filePath_1 = args[0];
 		
 		XMLProcessor xml = new XMLProcessor();
+		xml.createXmlFromYakindu(filePath_1);
 		
-		Statechart statechart = xml.createStatechartFromXml(filePath_1);
+		Statechart statechart = xml.createStatechartFromXml("temp.xml");
 		
 		//String filePath_2 = "/Users/rafaelgregorut/Documents/workspace/YakinduTest/file2.xml";
 	
@@ -22,6 +23,10 @@ public class Main {
 		statechart.constructStateIdHash();
 		TestGenerator tg = new TestGenerator(statechart);
 		Set<String> testPaths = tg.createTestPaths();
+		
+		TestPathsAdapter adapter = new TestPathsAdapter();
+		System.out.println("==========================================================");
+		adapter.adaptToSMPF(testPaths);
 		
 		/*System.out.println("Caminhos computados no all-transitions:");
 		for (String path : testPaths) {

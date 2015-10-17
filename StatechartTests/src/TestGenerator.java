@@ -158,9 +158,9 @@ public class TestGenerator {
 		//System.out.println("Printando tcSet2 apos uniao");
 		//printTestSet(tcSet2);
 		
-		generateTestCases(tcSet2);
+		Set<String> testPaths = generateTestCases(tcSet2);
 		
-		return null;
+		return testPaths;
 		//return generateTestPaths(mapVertPaths);
 	}
 	
