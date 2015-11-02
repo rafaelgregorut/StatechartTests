@@ -1,45 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <Statechart id="_E6cr0HGqEeWjFs16AhJ_Wg" specification="interface:&#xA;&#xA;in event A&#xA;in event B&#xA;in event C&#xA;in event D&#xA;in event E&#xA;in event F&#xA;in event G&#xA;in event H&#xA;in event I" name="test9">
-    <regions id="_E6dS4HGqEeWjFs16AhJ_Wg" name="main region">
-      <vertices type="Entry" id="_E6d58XGqEeWjFs16AhJ_Wg">
-        <outgoingTransitions id="_E6fIE3GqEeWjFs16AhJ_Wg" target="_E6d5_HGqEeWjFs16AhJ_Wg"/>
+  <Statechart id="_q4lH4H77EeW10aaQ1dR98Q" specification="interface:&#xA;&#xA;in event convertFileToXML&#xA;in event getProduct&#xA;in event getQuantity&#xA;in event EOF&#xA;in event nextLine&#xA;in event sendXMLToIntegration&#xA;in event sendXMLToMgmSys&#xA;" name="webEDI">
+    <regions id="_q4vf8n77EeW10aaQ1dR98Q" name="main region">
+      <vertices type="Entry" id="_q44C0H77EeW10aaQ1dR98Q">
+        <outgoingTransitions id="_q47GI377EeW10aaQ1dR98Q" target="_q44p5377EeW10aaQ1dR98Q"/>
       </vertices>
-      <vertices type="State" id="_E6d5_HGqEeWjFs16AhJ_Wg" name="1" incomingTransitions="_E6fIE3GqEeWjFs16AhJ_Wg">
-        <outgoingTransitions id="_MJMxgHGqEeWjFs16AhJ_Wg" specification="A" target="_GiFYAHGqEeWjFs16AhJ_Wg"/>
+      <vertices type="State" id="_q44p5377EeW10aaQ1dR98Q" name="Idle" incomingTransitions="_q47GI377EeW10aaQ1dR98Q">
+        <outgoingTransitions id="_zMVGwH77EeW10aaQ1dR98Q" specification="convertFileToXML" target="_wiFHAH77EeW10aaQ1dR98Q"/>
       </vertices>
-      <vertices type="State" id="_GiFYAHGqEeWjFs16AhJ_Wg" name="2" incomingTransitions="_MJMxgHGqEeWjFs16AhJ_Wg">
-        <outgoingTransitions id="_V0jcgHGqEeWjFs16AhJ_Wg" specification="B" target="_IbkCIHGqEeWjFs16AhJ_Wg"/>
-      </vertices>
-      <vertices type="State" id="_IbkCIHGqEeWjFs16AhJ_Wg" name="3" incomingTransitions="_V0jcgHGqEeWjFs16AhJ_Wg _3fhF0HGrEeWjFs16AhJ_Wg">
-        <outgoingTransitions id="_iJpw8HGqEeWjFs16AhJ_Wg" specification="G" target="_I7EooHGqEeWjFs16AhJ_Wg"/>
-        <regions id="_IbkpMHGqEeWjFs16AhJ_Wg" name="r1">
-          <vertices type="State" id="_PUlvcHGqEeWjFs16AhJ_Wg" name="3.1.1" incomingTransitions="_XLKqIHGqEeWjFs16AhJ_Wg">
-            <outgoingTransitions id="_bBNuoHGqEeWjFs16AhJ_Wg" specification="C" target="_SX5vcHGqEeWjFs16AhJ_Wg"/>
+      <vertices type="State" id="_wiFHAH77EeW10aaQ1dR98Q" name="File Processing" incomingTransitions="_zMVGwH77EeW10aaQ1dR98Q">
+        <outgoingTransitions id="_9VaPkH77EeW10aaQ1dR98Q" specification="sendXMLToIntegration" target="_7ydPEH77EeW10aaQ1dR98Q"/>
+        <regions id="_wiGVIH77EeW10aaQ1dR98Q" name="r1">
+          <vertices type="Entry" id="_LOoCIH78EeW10aaQ1dR98Q">
+            <outgoingTransitions id="_TSi1QH78EeW10aaQ1dR98Q" specification="" target="_Lx7jgH78EeW10aaQ1dR98Q"/>
           </vertices>
-          <vertices type="State" id="_QAWCMHGqEeWjFs16AhJ_Wg" name="3.1.3" incomingTransitions="_biG1MHGqEeWjFs16AhJ_Wg"/>
-          <vertices type="State" id="_SX5vcHGqEeWjFs16AhJ_Wg" name="3.1.2" incomingTransitions="_bBNuoHGqEeWjFs16AhJ_Wg">
-            <outgoingTransitions id="_biG1MHGqEeWjFs16AhJ_Wg" specification="D" target="_QAWCMHGqEeWjFs16AhJ_Wg"/>
+          <vertices type="State" id="_Lx7jgH78EeW10aaQ1dR98Q" name="File Received" incomingTransitions="_TSi1QH78EeW10aaQ1dR98Q">
+            <outgoingTransitions id="_tw1cgH79EeW10aaQ1dR98Q" specification="nextLine" target="_o31tQH79EeW10aaQ1dR98Q"/>
           </vertices>
-          <vertices type="Entry" id="_WnWLYHGqEeWjFs16AhJ_Wg">
-            <outgoingTransitions id="_XLKqIHGqEeWjFs16AhJ_Wg" specification="" target="_PUlvcHGqEeWjFs16AhJ_Wg"/>
+          <vertices type="State" id="_Tn7PYH78EeW10aaQ1dR98Q" name="Product Processed" incomingTransitions="_zniKIH79EeW10aaQ1dR98Q">
+            <outgoingTransitions id="_g59tMH78EeW10aaQ1dR98Q" specification="getQuantity" target="_ZIZOUH78EeW10aaQ1dR98Q"/>
           </vertices>
-        </regions>
-        <regions id="_IbkpMXGqEeWjFs16AhJ_Wg" name="r2">
-          <vertices type="State" id="_QWQn0HGqEeWjFs16AhJ_Wg" name="3.2.1" incomingTransitions="_fzLo0HGqEeWjFs16AhJ_Wg _k-epAHGqEeWjFs16AhJ_Wg">
-            <outgoingTransitions id="_kD9hgHGqEeWjFs16AhJ_Wg" specification="E" target="_Ru7q8HGqEeWjFs16AhJ_Wg"/>
+          <vertices type="State" id="_ZIZOUH78EeW10aaQ1dR98Q" name="Quantity Processed" incomingTransitions="_g59tMH78EeW10aaQ1dR98Q">
+            <outgoingTransitions id="_mwOV8H78EeW10aaQ1dR98Q" specification="EOF" target="_dKH-YH78EeW10aaQ1dR98Q"/>
+            <outgoingTransitions id="_0Yee4H79EeW10aaQ1dR98Q" specification="nextLine" target="_o31tQH79EeW10aaQ1dR98Q"/>
           </vertices>
-          <vertices type="State" id="_Ru7q8HGqEeWjFs16AhJ_Wg" name="3.2.2" incomingTransitions="_kD9hgHGqEeWjFs16AhJ_Wg">
-            <outgoingTransitions id="_k-epAHGqEeWjFs16AhJ_Wg" specification="F" target="_QWQn0HGqEeWjFs16AhJ_Wg"/>
-          </vertices>
-          <vertices type="Entry" id="_e0rZMHGqEeWjFs16AhJ_Wg">
-            <outgoingTransitions id="_fzLo0HGqEeWjFs16AhJ_Wg" specification="" target="_QWQn0HGqEeWjFs16AhJ_Wg"/>
+          <vertices type="State" id="_dKH-YH78EeW10aaQ1dR98Q" name="XML Creation" incomingTransitions="_mwOV8H78EeW10aaQ1dR98Q"/>
+          <vertices type="State" id="_o31tQH79EeW10aaQ1dR98Q" name="Line Retrieved" incomingTransitions="_tw1cgH79EeW10aaQ1dR98Q _0Yee4H79EeW10aaQ1dR98Q">
+            <outgoingTransitions id="_zniKIH79EeW10aaQ1dR98Q" specification="getProduct" target="_Tn7PYH78EeW10aaQ1dR98Q"/>
           </vertices>
         </regions>
       </vertices>
-      <vertices type="State" id="_I7EooHGqEeWjFs16AhJ_Wg" name="4" incomingTransitions="_iJpw8HGqEeWjFs16AhJ_Wg">
-        <outgoingTransitions id="_3fhF0HGrEeWjFs16AhJ_Wg" specification="H" target="_IbkCIHGqEeWjFs16AhJ_Wg"/>
-        <outgoingTransitions id="_5neQ0HGrEeWjFs16AhJ_Wg" specification="I" target="_4dtzcHGrEeWjFs16AhJ_Wg"/>
+      <vertices type="State" id="_7ydPEH77EeW10aaQ1dR98Q" name="Integration Layer" incomingTransitions="_9VaPkH77EeW10aaQ1dR98Q">
+        <outgoingTransitions id="_BnyDsH78EeW10aaQ1dR98Q" specification="sendXMLToMgmSys" target="__xaX8H77EeW10aaQ1dR98Q"/>
       </vertices>
-      <vertices type="State" id="_4dtzcHGrEeWjFs16AhJ_Wg" name="5" incomingTransitions="_5neQ0HGrEeWjFs16AhJ_Wg"/>
+      <vertices type="State" id="__xaX8H77EeW10aaQ1dR98Q" name="Management System" incomingTransitions="_BnyDsH78EeW10aaQ1dR98Q"/>
     </regions>
   </Statechart>

@@ -23,6 +23,8 @@ public class TestGenerator {
 	
 	Hashtable<Vertices,Set<String>> hashFilhos;
 	
+	Output out;
+	
 	//Set<String> testPaths;
 	
 	/*PRIMEIRO VOU PENSAR EM UM STATECHART SIMPLES DE TUDO*/
@@ -33,6 +35,7 @@ public class TestGenerator {
 		//testPaths = new TreeSet<String>();
 		reverseMapSetC = new Hashtable<String,Vertices>();
 		this.sc = sc;
+		out = Main.out;
 	}
 	
 	public Set<String> expandPath(String original, Set<String> pathsFilhosSet, Vertices vPai) {
@@ -120,18 +123,20 @@ public class TestGenerator {
 		/*Gero o setC, ainda nao expandido*/
 		Hashtable<Vertices,String> mapSetC = mainRegion.constructSetC(sc.statesId,hashFilhos);
 		
-		//System.out.println("Set C:");
-		/*for (Vertices v : mapSetC.keySet()) {
+		/*System.out.println("Set C:");
+		for (Vertices v : mapSetC.keySet()) {
 			System.out.println(v.getName()+"("+v.getType()+")"+" coberto por *"+mapSetC.get(v)+"*");
 		}*/
 		
-		//System.out.println("Semi-Expanded set C:");
+		//out.println("Semi-Expanded set C:");
 		/*Preciso expandir o Set C*/
 		//reverseMapSetC = reverseHash(mapSetC);
 		expandPaiPath(mapSetC);
 		/*for (Vertices v : mapSetC.keySet()) {
-			System.out.println(v.getName()+"("+v.getType()+")"+" coberto por *"+mapSetC.get(v)+"*");
-		}*/
+			out.println(v.getName()+"("+v.getType()+")"+" coberto por *"+mapSetC.get(v)+"*");
+		}
+		out.println("==================================================");
+		*/
 		
 		//System.out.println("Componentes de teste simples:");
 		Set<TestComponent> tcSet = geraComponentesDeTestSimples(mapSetC);
@@ -216,14 +221,14 @@ public class TestGenerator {
 		
 		for (TestComponent tc : tcSet) {
 			Vertices state = tc.atingido;
-			System.out.println("State: "+state.getName()+" ("+state.getType()+")");
-			for (OutgoingTransitions out : state.getListTransitions()) {
-				if (out.getSpecification() != null) {
-					String testPath = tc.sequenciaCobertura+" "+out.getSpecification();
+			out.println("State: "+state.getName()+" ("+state.getType()+")");
+			for (OutgoingTransitions outTrans : state.getListTransitions()) {
+				if (outTrans.getSpecification() != null) {
+					String testPath = tc.sequenciaCobertura+" "+outTrans.getSpecification();
 					testPaths.add(testPath);
-					System.out.println("\tTransition to be tested: "+out.getSpecification());
-					System.out.println("\tTest path: "+testPath);
-					System.out.println("\tExpected state: "+sc.statesId.get(out.getTarget()).getName());
+					out.println("\tTransition to be tested: "+outTrans.getSpecification());
+					out.println("\t\tTest path: "+testPath);
+					out.println("\t\tExpected state: "+sc.statesId.get(outTrans.getTarget()).getName());
 				}
 			}
 		}
@@ -232,7 +237,7 @@ public class TestGenerator {
 	
 	public void printTestSet(Set<TestComponent> s) {
 		for (TestComponent tc : s) {
-			System.out.println("tc: "+tc.sequenciaCobertura+" "+tc.atingido.getName()+" ("+tc.atingido.getType()+")");
+			out.println("tc: "+tc.sequenciaCobertura+" "+tc.atingido.getName()+" ("+tc.atingido.getType()+")");
 		}
 	}
 	
