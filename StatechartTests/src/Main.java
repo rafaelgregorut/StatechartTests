@@ -1,36 +1,35 @@
 import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import java.awt.GridLayout;
-import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
-import java.awt.FlowLayout;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JLabel;
-
+import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Set;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 import xml.handler.XMLProcessor;
 import xml.statechart.Statechart;
-import javax.swing.JCheckBox;
 
 public class Main {
 
 	private JFrame frame;
 	private JTextField textField;
 	
-	JTextArea textArea;
-	
 	JButton btnNewButton;
 	
 	public static Output out;
-	private JCheckBox chckbxSpmf;
+	public  JTable table;
 
+	private Set<String> testPaths;
+	private Set<String> csvLines;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -62,71 +61,113 @@ public class Main {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setResizable(false);
-		frame.setBounds(100, 100, 649, 479);
+		frame.setBounds(100, 100, 984, 596);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(16, 80, 962, 450);
+		frame.getContentPane().add(scrollPane);
+		
+
+		String[] columnNames = {"State",
+	            "Transition",
+	            "Test Path",
+	            "Expected State"};
+		DefaultTableModel model = new DefaultTableModel(null,columnNames);
+		
+		table = new JTable(model);
+		scrollPane.setViewportView(table);
+		
+		table.setBounds(688, 100, 1, 1);
+		
+		out = new Output(table);
 		
 		btnNewButton = new JButton("Create test cases");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				out.clear();
 				
-				String filePath_1 = textField.getText();
+				
+				//out.clear();
 				
 				XMLProcessor xml = new XMLProcessor();
-				xml.createXmlFromYakindu(filePath_1);
+				String filePath = textField.getText();
+				xml.createXmlFromYakindu(filePath);
 				
 				try {
 					Statechart statechart = xml.createStatechartFromXml("temp.xml");
-				
+						
 					statechart.constructStateIdHash();
 					TestGenerator tg = new TestGenerator(statechart);
-					Set<String> testPaths = tg.createTestPaths();
-				
-					if (chckbxSpmf.isSelected()) {
-						TestPathsAdapter adapter = new TestPathsAdapter();
-						out.println("==========================================================");
-						out.println("Test paths for SPMF");
-						//textArea.append("####################");
-						adapter.adaptToSMPF(testPaths);
-					}
-					/*System.out.println("Caminhos computados no all-transitions:");
-					for (String path : testPaths) {
-						System.out.println(path);
-					}*/
+					testPaths = tg.createTestPaths();
+					csvLines = tg.csvLines;
 				} catch(Exception ex) {
 					ex.printStackTrace();
 				}
 				
 			}
 		});
-		btnNewButton.setBounds(495, 39, 134, 29);
+		btnNewButton.setBounds(844, 39, 134, 29);
 		frame.getContentPane().add(btnNewButton);
 		
 		textField = new JTextField();
-		textField.setBounds(16, 38, 403, 28);
+		textField.setBounds(264, 4, 579, 28);
 		frame.getContentPane().add(textField);
 		textField.setColumns(10);
 		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(16, 73, 613, 378);
-		frame.getContentPane().add(scrollPane);
 		
-		//
-		textArea = new JTextArea();
-		textArea.setEditable(false);
-		out = new Output(textArea);
-
-		
-//		textArea.setText("blaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nbla\nbla\nbla\n");
-		scrollPane.setViewportView(textArea);
 		
 		JLabel lblNewLabel = new JLabel("Path to your Yakindu Statechart (.sct):");
 		lblNewLabel.setBounds(16, 0, 258, 37);
 		frame.getContentPane().add(lblNewLabel);
 		
-		chckbxSpmf = new JCheckBox("SPMF");
-		chckbxSpmf.setBounds(423, 31, 79, 42);
-		frame.getContentPane().add(chckbxSpmf);
+		JButton btnOpenStatechart = new JButton("Open Statechart");
+		btnOpenStatechart.setBounds(844, 5, 134, 29);
+		btnOpenStatechart.addActionListener(new ActionListener() {
+			String filePath;
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+				int result = fileChooser.showOpenDialog(frame);
+				if (result == JFileChooser.APPROVE_OPTION) {
+				    File selectedFile = fileChooser.getSelectedFile();
+				    filePath = selectedFile.getAbsolutePath();
+				}
+				textField.setText(filePath);
+			}
+		});
+		frame.getContentPane().add(btnOpenStatechart);
+		
+		JButton btnExportInSpmf = new JButton("Export in SPMF format");
+		btnExportInSpmf.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				FileDialog fDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
+		        fDialog.setVisible(true);
+		        String spmfPath = fDialog.getDirectory() + fDialog.getFile();
+				TestPathsAdapter adapter = new TestPathsAdapter();
+		        Set<String> adaptedPaths = adapter.adaptToSMPF(testPaths);
+		        out.writeSPMFToFile(spmfPath, adaptedPaths);
+		        
+			}
+		});
+		btnExportInSpmf.setBounds(660, 542, 183, 29);
+		frame.getContentPane().add(btnExportInSpmf);
+		
+		JButton btnExportTocsv = new JButton("Export to .csv");
+		btnExportTocsv.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				FileDialog fDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
+		        fDialog.setVisible(true);
+		        String csvPath = fDialog.getDirectory() + fDialog.getFile();
+		        out.writeCsvToFile(csvPath, csvLines);
+			}
+		});
+		btnExportTocsv.setBounds(844, 542, 134, 29);
+		frame.getContentPane().add(btnExportTocsv);
+		
+		
 	}
 }

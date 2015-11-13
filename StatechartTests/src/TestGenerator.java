@@ -25,6 +25,8 @@ public class TestGenerator {
 	
 	Output out;
 	
+	public Set<String> csvLines;
+	
 	//Set<String> testPaths;
 	
 	/*PRIMEIRO VOU PENSAR EM UM STATECHART SIMPLES DE TUDO*/
@@ -36,6 +38,7 @@ public class TestGenerator {
 		reverseMapSetC = new Hashtable<String,Vertices>();
 		this.sc = sc;
 		out = Main.out;
+		csvLines = new TreeSet<String>();
 	}
 	
 	public Set<String> expandPath(String original, Set<String> pathsFilhosSet, Vertices vPai) {
@@ -221,14 +224,16 @@ public class TestGenerator {
 		
 		for (TestComponent tc : tcSet) {
 			Vertices state = tc.atingido;
-			out.println("State: "+state.getName()+" ("+state.getType()+")");
+			//out.println("State: "+state.getName()+" ("+state.getType()+")");
 			for (OutgoingTransitions outTrans : state.getListTransitions()) {
 				if (outTrans.getSpecification() != null) {
 					String testPath = tc.sequenciaCobertura+" "+outTrans.getSpecification();
 					testPaths.add(testPath);
-					out.println("\tTransition to be tested: "+outTrans.getSpecification());
-					out.println("\t\tTest path: "+testPath);
-					out.println("\t\tExpected state: "+sc.statesId.get(outTrans.getTarget()).getName());
+					//out.println("\tTransition to be tested: "+outTrans.getSpecification());
+					//out.println("\t\tTest path: "+testPath);
+					//out.println("\t\tExpected state: "+sc.statesId.get(outTrans.getTarget()).getName());
+					out.printRow(state.getName(),outTrans.getSpecification(),testPath,sc.statesId.get(outTrans.getTarget()).getName());
+					csvLines.add(state.getName()+","+outTrans.getSpecification()+","+testPath+","+sc.statesId.get(outTrans.getTarget()).getName());
 				}
 			}
 		}

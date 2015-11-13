@@ -1,51 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <Statechart id="_q4lH4H77EeW10aaQ1dR98Q" specification="interface:&#xA;&#xA;in event submitOrder&#xA;in event getProduct&#xA;in event getQuantity&#xA;in event end&#xA;in event nextEntry&#xA;in event sendXMLToIntegration&#xA;in event sendXMLToMgmSys&#xA;in event startEmailJob&#xA;in event composeEmail&#xA;in event sendEmail&#xA;in event sleep" name="webEDI">
-    <regions id="_q4vf8n77EeW10aaQ1dR98Q" name="main region">
-      <vertices type="Entry" id="_q44C0H77EeW10aaQ1dR98Q">
-        <outgoingTransitions id="_q47GI377EeW10aaQ1dR98Q" target="_q44p5377EeW10aaQ1dR98Q"/>
+  <Statechart id="_agKv4Ha0EeWAPuZiXLrQsQ" specification="interface:&#xA;&#xA;in event doLogin&#xA;in event searchLineNumber&#xA;in event searchEmployee&#xA;in event setRegularUser&#xA;in event setEmployeeUser&#xA;in event searchContract&#xA;in event setNotCommittedUser&#xA;in event setCommittedUser&#xA;in event proceedCheckout&#xA;in event emptyCart&#xA;" name="">
+    <regions id="_aiGpkHa0EeWAPuZiXLrQsQ" name="main region">
+      <vertices type="Entry" id="_akRMwHa0EeWAPuZiXLrQsQ">
+        <outgoingTransitions id="_akoZIHa0EeWAPuZiXLrQsQ" target="_akU3IHa0EeWAPuZiXLrQsQ"/>
       </vertices>
-      <vertices type="State" id="_q44p5377EeW10aaQ1dR98Q" name="Purchase concluded" incomingTransitions="_q47GI377EeW10aaQ1dR98Q">
-        <outgoingTransitions id="_zMVGwH77EeW10aaQ1dR98Q" specification="submitOrder" target="_wiFHAH77EeW10aaQ1dR98Q"/>
+      <vertices type="State" id="_akU3IHa0EeWAPuZiXLrQsQ" name="Unlogged user" incomingTransitions="_akoZIHa0EeWAPuZiXLrQsQ">
+        <outgoingTransitions id="_qZq_MHa0EeWAPuZiXLrQsQ" specification="doLogin" target="_o16GYHa0EeWAPuZiXLrQsQ"/>
       </vertices>
-      <vertices type="State" id="_wiFHAH77EeW10aaQ1dR98Q" name="Order Processing" incomingTransitions="_zMVGwH77EeW10aaQ1dR98Q">
-        <outgoingTransitions id="_9VaPkH77EeW10aaQ1dR98Q" specification="sendXMLToIntegration" target="_7ydPEH77EeW10aaQ1dR98Q"/>
-        <regions id="_wiGVIH77EeW10aaQ1dR98Q" name="XML preparation">
-          <vertices type="Entry" id="_LOoCIH78EeW10aaQ1dR98Q">
-            <outgoingTransitions id="_TSi1QH78EeW10aaQ1dR98Q" specification="" target="_Lx7jgH78EeW10aaQ1dR98Q"/>
-          </vertices>
-          <vertices type="State" id="_Lx7jgH78EeW10aaQ1dR98Q" name="Order Received" incomingTransitions="_TSi1QH78EeW10aaQ1dR98Q">
-            <outgoingTransitions id="_tw1cgH79EeW10aaQ1dR98Q" specification="nextEntry" target="_o31tQH79EeW10aaQ1dR98Q"/>
-          </vertices>
-          <vertices type="State" id="_Tn7PYH78EeW10aaQ1dR98Q" name="Product Processed" incomingTransitions="_zniKIH79EeW10aaQ1dR98Q">
-            <outgoingTransitions id="_g59tMH78EeW10aaQ1dR98Q" specification="getQuantity" target="_ZIZOUH78EeW10aaQ1dR98Q"/>
-          </vertices>
-          <vertices type="State" id="_ZIZOUH78EeW10aaQ1dR98Q" name="Quantity Processed" incomingTransitions="_g59tMH78EeW10aaQ1dR98Q">
-            <outgoingTransitions id="_mwOV8H78EeW10aaQ1dR98Q" specification="end" target="_dKH-YH78EeW10aaQ1dR98Q"/>
-            <outgoingTransitions id="_0Yee4H79EeW10aaQ1dR98Q" specification="nextEntry" target="_o31tQH79EeW10aaQ1dR98Q"/>
-          </vertices>
-          <vertices type="State" id="_dKH-YH78EeW10aaQ1dR98Q" name="XML Creation" incomingTransitions="_mwOV8H78EeW10aaQ1dR98Q"/>
-          <vertices type="State" id="_o31tQH79EeW10aaQ1dR98Q" name="Entry Retrieved" incomingTransitions="_tw1cgH79EeW10aaQ1dR98Q _0Yee4H79EeW10aaQ1dR98Q">
-            <outgoingTransitions id="_zniKIH79EeW10aaQ1dR98Q" specification="getProduct" target="_Tn7PYH78EeW10aaQ1dR98Q"/>
-          </vertices>
-        </regions>
-        <regions id="_1TTXAIfSEeWjXp_aCjSKhQ" name="Email job execution">
-          <vertices type="Entry" id="__dodAIfSEeWjXp_aCjSKhQ">
-            <outgoingTransitions id="_JL6gMIfTEeWjXp_aCjSKhQ" specification="" target="_AGJOgIfTEeWjXp_aCjSKhQ"/>
-          </vertices>
-          <vertices type="State" id="_AGJOgIfTEeWjXp_aCjSKhQ" name="Idle" incomingTransitions="_JL6gMIfTEeWjXp_aCjSKhQ _PC2eYIfTEeWjXp_aCjSKhQ">
-            <outgoingTransitions id="_KQdtcIfTEeWjXp_aCjSKhQ" specification="startEmailJob" target="_A1u4YIfTEeWjXp_aCjSKhQ"/>
-          </vertices>
-          <vertices type="State" id="_A1u4YIfTEeWjXp_aCjSKhQ" name="Email job started" incomingTransitions="_KQdtcIfTEeWjXp_aCjSKhQ">
-            <outgoingTransitions id="_MYQgYIfTEeWjXp_aCjSKhQ" specification="composeEmail" target="_EPzykIfTEeWjXp_aCjSKhQ"/>
-          </vertices>
-          <vertices type="State" id="_EPzykIfTEeWjXp_aCjSKhQ" name="Email ready" incomingTransitions="_MYQgYIfTEeWjXp_aCjSKhQ">
-            <outgoingTransitions id="_NyXG4IfTEeWjXp_aCjSKhQ" specification="sendEmail" target="_E8mAEIfTEeWjXp_aCjSKhQ"/>
-          </vertices>
-          <vertices type="State" id="_E8mAEIfTEeWjXp_aCjSKhQ" name="Email sent" incomingTransitions="_NyXG4IfTEeWjXp_aCjSKhQ">
-            <outgoingTransitions id="_PC2eYIfTEeWjXp_aCjSKhQ" specification="sleep" target="_AGJOgIfTEeWjXp_aCjSKhQ"/>
-          </vertices>
-        </regions>
+      <vertices type="State" id="_o16GYHa0EeWAPuZiXLrQsQ" name="Logged in User" incomingTransitions="_qZq_MHa0EeWAPuZiXLrQsQ">
+        <outgoingTransitions id="_s7GaIHa0EeWAPuZiXLrQsQ" specification="searchLineNumber" target="_rl7-AHa0EeWAPuZiXLrQsQ"/>
       </vertices>
-      <vertices type="State" id="_7ydPEH77EeW10aaQ1dR98Q" name="Integration Layer" incomingTransitions="_9VaPkH77EeW10aaQ1dR98Q"/>
+      <vertices type="State" id="_rl7-AHa0EeWAPuZiXLrQsQ" name="Number Selected" incomingTransitions="_s7GaIHa0EeWAPuZiXLrQsQ">
+        <outgoingTransitions id="_3x0FAHa0EeWAPuZiXLrQsQ" specification="searchEmployee" target="_t6Pi8Ha0EeWAPuZiXLrQsQ"/>
+      </vertices>
+      <vertices type="State" id="_t6Pi8Ha0EeWAPuZiXLrQsQ" name="Employee Authentication" incomingTransitions="_3x0FAHa0EeWAPuZiXLrQsQ">
+        <outgoingTransitions id="_8rJLcHa0EeWAPuZiXLrQsQ" specification="setRegularUser" target="_6Vm3cHa0EeWAPuZiXLrQsQ"/>
+        <outgoingTransitions id="_RyweYHa1EeWAPuZiXLrQsQ" specification="setEmployeeUser" target="_PnikAHa1EeWAPuZiXLrQsQ"/>
+      </vertices>
+      <vertices type="State" id="_6Vm3cHa0EeWAPuZiXLrQsQ" name="Regular User" incomingTransitions="_8rJLcHa0EeWAPuZiXLrQsQ">
+        <outgoingTransitions id="_CokzMHa1EeWAPuZiXLrQsQ" specification="searchContract" target="_97KB0Ha0EeWAPuZiXLrQsQ"/>
+      </vertices>
+      <vertices type="State" id="_97KB0Ha0EeWAPuZiXLrQsQ" name="Contract Authentication" incomingTransitions="_CokzMHa1EeWAPuZiXLrQsQ">
+        <outgoingTransitions id="_HGcFoHa1EeWAPuZiXLrQsQ" specification="setNotCommittedUser" target="_EvNIgHa1EeWAPuZiXLrQsQ"/>
+        <outgoingTransitions id="_WCTA8Ha1EeWAPuZiXLrQsQ" specification="setCommittedUser" target="_T6yh4Ha1EeWAPuZiXLrQsQ"/>
+      </vertices>
+      <vertices type="State" id="_EvNIgHa1EeWAPuZiXLrQsQ" name="Not Committed User" incomingTransitions="_HGcFoHa1EeWAPuZiXLrQsQ">
+        <outgoingTransitions id="_J0fnUHa1EeWAPuZiXLrQsQ" specification="proceedCheckout" target="_IV47UHa1EeWAPuZiXLrQsQ"/>
+      </vertices>
+      <vertices type="State" id="_IV47UHa1EeWAPuZiXLrQsQ" name="Checkout" incomingTransitions="_J0fnUHa1EeWAPuZiXLrQsQ"/>
+      <vertices type="State" id="_PnikAHa1EeWAPuZiXLrQsQ" name="Employee USer" incomingTransitions="_RyweYHa1EeWAPuZiXLrQsQ">
+        <outgoingTransitions id="_Z2gSYHa1EeWAPuZiXLrQsQ" specification="emptyCart" target="_YLuLkHa1EeWAPuZiXLrQsQ"/>
+      </vertices>
+      <vertices type="State" id="_T6yh4Ha1EeWAPuZiXLrQsQ" name="Committed User" incomingTransitions="_WCTA8Ha1EeWAPuZiXLrQsQ">
+        <outgoingTransitions id="_axUU0Ha1EeWAPuZiXLrQsQ" specification="emptyCart" target="_YLuLkHa1EeWAPuZiXLrQsQ"/>
+      </vertices>
+      <vertices type="State" id="_YLuLkHa1EeWAPuZiXLrQsQ" name="Empty Cart" incomingTransitions="_Z2gSYHa1EeWAPuZiXLrQsQ _axUU0Ha1EeWAPuZiXLrQsQ"/>
     </regions>
   </Statechart>
