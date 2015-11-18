@@ -10,6 +10,8 @@ import javax.swing.table.DefaultTableModel;
 public class Output {
 
 	private JTextArea textArea;
+	
+	//The table to which we are printing the output
 	private JTable table;
 
 	Output(JTextArea ta) {
@@ -28,11 +30,13 @@ public class Output {
 		textArea.setText(null);
 	}
 	
+	//Prints a row in the table
 	public void printRow(String state, String transition, String path, String expected) {
 		DefaultTableModel myModel = (DefaultTableModel) table.getModel();
 		myModel.addRow(new Object[]{state, transition, path, expected});
 	}
 	
+	//write to the file used by SPMF
 	public void writeSPMFToFile(String filePath, Set<String> lines) {
 		try
 		{
@@ -50,6 +54,7 @@ public class Output {
 		}
 	}
 	
+	//write to csv file
 	public void writeCsvToFile(String filePath, Set<String> csvContent) {
 		try
 		{

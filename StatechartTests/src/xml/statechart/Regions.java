@@ -19,9 +19,7 @@ public class Regions {
 	private ArrayList<Vertices> listVertices;
 
 	private String name;
-	
-	//public ArrayList<EventList> setC;
-	
+		
 	public Regions() {
 		listVertices = new ArrayList<Vertices>();
 	}
@@ -64,7 +62,6 @@ public class Regions {
 	
 	public Vertices getInitialState() {
 		for (Vertices v : listVertices) {
-			//System.out.println(v.getType());
 			if (v.getType().equals("Entry")) {
 				return v;
 			}
@@ -72,6 +69,7 @@ public class Regions {
 		return null;
 	}
 	
+	//Constroi conjunto de cobertura de estados
 	public Hashtable<Vertices,String> constructSetC(Hashtable<String,Vertices> hash, 
 			Hashtable<Vertices,Set<String>> hashFilhos) {
 		Vertices initial = getInitialState();
@@ -80,30 +78,11 @@ public class Regions {
 		Hashtable<Vertices,String> setCHash = new Hashtable<Vertices,String>();
 		
 		constructSetCRec(0,initial,hash,visit,"",setCHash,hashFilhos);
-		
-		/*System.out.println("Hash de filhos:");
-		for (Vertices vPai2 : hashFilhos.keySet()) {
-			for (String str2 : hashFilhos.get(vPai2))
-				System.out.println(vPai2.getName()+" -> "+str2);
-		}*/
-		
+				
 		return setCHash;
 	}
 	
-	private void printRec(int i) {
-		for (int j = 0; j < i; j++)
-			System.out.print("\t");
-	}
-	
-	private boolean caminhoJaTemPai(Hashtable<Vertices,Set<String>> hashFilhos, String caminho) {
-		for (Map.Entry<Vertices, Set<String>> entry : hashFilhos.entrySet()) {
-			if (entry.getValue().contains(caminho))
-				return true;
-		}
-		return false;
-	}
-	
-
+	//Constroi conjunto de cobertura de estados (Recursivo)
 	public Hashtable<Vertices,String> constructSetCRec(int i,Vertices v, Hashtable<String, Vertices> hashId, ArrayList<Vertices> visitados,String p, 
 			Hashtable<Vertices,String> setCHash, Hashtable<Vertices,Set<String>> hashFilhos) {
 		/*Adiciono o vertice na lista de visitados*/

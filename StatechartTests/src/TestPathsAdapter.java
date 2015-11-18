@@ -10,6 +10,7 @@ public class TestPathsAdapter {
 		out = Main.out;
 	}
 	
+	//Adapt the test paths to the SPMF format
 	public Set<String> adaptToSMPF(Set<String> testSet) {
 		Set<String> results = new TreeSet<String>();
 		for (String str : testSet) {

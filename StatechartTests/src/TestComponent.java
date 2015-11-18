@@ -3,7 +3,9 @@ import xml.statechart.Vertices;
 
 public class TestComponent implements Comparable<TestComponent> {
 
+	//Coverage path
 	String sequenciaCobertura;
+	//Destiny vertex
 	Vertices atingido;
 	
 	public TestComponent(String s, Vertices v) {

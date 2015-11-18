@@ -39,8 +39,6 @@ public class Main {
 				try {
 					Main window = new Main();
 					window.frame.setVisible(true);
-					
-				
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -55,9 +53,60 @@ public class Main {
 		initialize();
 	}
 
+	//action for the create test cases button
+	private void actionCreateTestCasesButton() {
+		XMLProcessor xml = new XMLProcessor();
+		String filePath = textField.getText();
+		xml.createXmlFromYakindu(filePath);
+		
+		try {
+			Statechart statechart = xml.createStatechartFromXml("temp.xml");
+				
+			statechart.constructStateIdHash();
+			TestGenerator tg = new TestGenerator(statechart);
+			testPaths = tg.createTestPaths();
+			csvLines = tg.csvLines;
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	//action for the open button
+	private void actionOpenStatechartButton() {
+		String filePath = "";
+
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+		int result = fileChooser.showOpenDialog(frame);
+		if (result == JFileChooser.APPROVE_OPTION) {
+		    File selectedFile = fileChooser.getSelectedFile();
+		    filePath = selectedFile.getAbsolutePath();
+		}
+		textField.setText(filePath);
+	}
+	
+	//action for the export spmf button
+	private void actionExportSPMFButton() {
+		FileDialog fDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
+        fDialog.setVisible(true);
+        String spmfPath = fDialog.getDirectory() + fDialog.getFile();
+		TestPathsAdapter adapter = new TestPathsAdapter();
+        Set<String> adaptedPaths = adapter.adaptToSMPF(testPaths);
+        out.writeSPMFToFile(spmfPath, adaptedPaths);
+	}
+	
+	//action for the export csv button
+	private void actionExportCsvButton() {
+		FileDialog fDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
+        fDialog.setVisible(true);
+        String csvPath = fDialog.getDirectory() + fDialog.getFile();
+        out.writeCsvToFile(csvPath, csvLines);
+	}
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
+	
 	private void initialize() {
 		frame = new JFrame();
 		frame.setResizable(false);
@@ -71,10 +120,7 @@ public class Main {
 		frame.getContentPane().add(scrollPane);
 		
 
-		String[] columnNames = {"State",
-	            "Transition",
-	            "Test Path",
-	            "Expected State"};
+		String[] columnNames = {"State","Transition","Test Path","Expected State"};
 		DefaultTableModel model = new DefaultTableModel(null,columnNames);
 		
 		table = new JTable(model);
@@ -87,25 +133,7 @@ public class Main {
 		btnNewButton = new JButton("Create test cases");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				
-				//out.clear();
-				
-				XMLProcessor xml = new XMLProcessor();
-				String filePath = textField.getText();
-				xml.createXmlFromYakindu(filePath);
-				
-				try {
-					Statechart statechart = xml.createStatechartFromXml("temp.xml");
-						
-					statechart.constructStateIdHash();
-					TestGenerator tg = new TestGenerator(statechart);
-					testPaths = tg.createTestPaths();
-					csvLines = tg.csvLines;
-				} catch(Exception ex) {
-					ex.printStackTrace();
-				}
-				
+				actionCreateTestCasesButton();
 			}
 		});
 		btnNewButton.setBounds(844, 39, 134, 29);
@@ -125,16 +153,8 @@ public class Main {
 		JButton btnOpenStatechart = new JButton("Open Statechart");
 		btnOpenStatechart.setBounds(844, 5, 134, 29);
 		btnOpenStatechart.addActionListener(new ActionListener() {
-			String filePath;
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = new JFileChooser();
-				fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-				int result = fileChooser.showOpenDialog(frame);
-				if (result == JFileChooser.APPROVE_OPTION) {
-				    File selectedFile = fileChooser.getSelectedFile();
-				    filePath = selectedFile.getAbsolutePath();
-				}
-				textField.setText(filePath);
+				actionOpenStatechartButton();
 			}
 		});
 		frame.getContentPane().add(btnOpenStatechart);
@@ -142,14 +162,7 @@ public class Main {
 		JButton btnExportInSpmf = new JButton("Export in SPMF format");
 		btnExportInSpmf.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				FileDialog fDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
-		        fDialog.setVisible(true);
-		        String spmfPath = fDialog.getDirectory() + fDialog.getFile();
-				TestPathsAdapter adapter = new TestPathsAdapter();
-		        Set<String> adaptedPaths = adapter.adaptToSMPF(testPaths);
-		        out.writeSPMFToFile(spmfPath, adaptedPaths);
-		        
+				actionExportSPMFButton();
 			}
 		});
 		btnExportInSpmf.setBounds(660, 542, 183, 29);
@@ -158,11 +171,7 @@ public class Main {
 		JButton btnExportTocsv = new JButton("Export to .csv");
 		btnExportTocsv.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				FileDialog fDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
-		        fDialog.setVisible(true);
-		        String csvPath = fDialog.getDirectory() + fDialog.getFile();
-		        out.writeCsvToFile(csvPath, csvLines);
+				actionExportCsvButton();
 			}
 		});
 		btnExportTocsv.setBounds(844, 542, 134, 29);
